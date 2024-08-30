@@ -21,12 +21,12 @@ public class PostPhotoEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
-    private PostEntity post;
+    private Post post;
 
     @Column(name = "image_path")
     private String imagePath;
 
-    public PostPhotoEntity(PostEntity post, String imagePath){
+    public PostPhotoEntity(Post post, String imagePath){
         this.post = post;
         this.imagePath = imagePath;
     }

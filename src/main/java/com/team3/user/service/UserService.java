@@ -1,9 +1,9 @@
 package com.team3.user.service;
 
-import com.team3.user.entity.MyPageDto;
+import com.team3.user.dto.MyPageDto;
 import com.team3.user.entity.User;
-import com.team3.user.entity.UserLoginDto;
-import com.team3.user.entity.UserSignupDto;
+import com.team3.user.dto.UserLoginDto;
+import com.team3.user.dto.UserSignupDto;
 
 public interface UserService {
     // 로그인 메서드

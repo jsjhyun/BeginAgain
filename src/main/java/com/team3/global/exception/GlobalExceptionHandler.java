@@ -1,6 +1,6 @@
 package com.team3.global.exception;
 
-import com.team3.user.entity.UserSignupDto;
+import com.team3.user.dto.UserSignupDto;
 import com.team3.user.exception.*;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;

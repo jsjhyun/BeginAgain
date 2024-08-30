@@ -1,6 +1,6 @@
 package com.team3.user.controller;
 
-import com.team3.user.entity.UserSignupDto;
+import com.team3.user.dto.UserSignupDto;
 import com.team3.user.service.UserServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ public class SignupController {
     @GetMapping("/signup")
     public String signupForm(Model model) {
         model.addAttribute("userSignupDto", new UserSignupDto());
-        return "signup";
+        return "user/signup";
     }
 
     // 회원가입 처리
@@ -31,16 +31,16 @@ public class SignupController {
         // 유효성 검사
         if (bindingResult.hasErrors()) {
             model.addAttribute("userSignupDto", userSignupDto);
-            return "signup";
+            return "user/signup";
         }
 
         try {
             userService.signup(userSignupDto);
-            return "redirect:/login";
+            return "redirect:user/login";
         } catch (IllegalArgumentException e) {
             model.addAttribute("signupError", e.getMessage()); // 사용자에게 회원가입 실패 이유 전달
             model.addAttribute("userSignupDto", userSignupDto); // 입력 데이터 유지
-            return "signup";
+            return "user/signup";
         }
     }
 }

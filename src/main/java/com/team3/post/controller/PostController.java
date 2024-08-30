@@ -1,13 +1,12 @@
 package com.team3.post.controller;
 
 
-import com.team3.board.BoardEntity;
-import com.team3.board.BoardService;
+import com.team3.board.service.BoardService;
 import com.team3.comment.entity.Comment;
-import com.team3.comment.entity.CommentDto;
+import com.team3.comment.dto.CommentDto;
 import com.team3.comment.service.CommentService;
-import com.team3.post.entity.PostDto;
-import com.team3.post.entity.PostEntity;
+import com.team3.post.dto.PostDto;
+import com.team3.post.entity.Post;
 import com.team3.post.entity.PostPhotoEntity;
 import com.team3.post.service.PostPhotoService;
 import com.team3.post.service.PostService;
@@ -20,10 +19,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/post")
@@ -115,7 +112,7 @@ public class PostController {
                              Model m,
                              HttpSession session){
         //게시글 로직
-        PostEntity post = postService.getPostByPostId(postId);
+        Post post = postService.getPostByPostId(postId);
         Integer boardId = post.getBoard().getBoardId();
         Integer currentSessionUserId = (Integer)session.getAttribute("userId");
 
@@ -252,7 +249,7 @@ public class PostController {
 
         //글 작성자가 맞으면 수정페이지로 이동, 아니면 메시지 띄운 후 다시 게시글 페이지로
         if(postService.userCheck((Integer)session.getAttribute("userId"), userId)){
-            PostEntity post = postService.getPostByPostId(postId);
+            Post post = postService.getPostByPostId(postId);
 
             m.addAttribute("post", post);
             return "post/post_modify";

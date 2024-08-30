@@ -1,18 +1,19 @@
-package com.team3.board;
+package com.team3.board.controller;
 
+import com.team3.board.*;
+import com.team3.board.dto.CreateBoardDto;
+import com.team3.board.dto.UpdateBoardDTO;
+import com.team3.board.entity.Board;
+import com.team3.board.service.BoardService;
 import com.team3.post.service.PostService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import java.net.URI;
-import java.util.List;
 
 @Controller
 @RequestMapping("/board")
@@ -33,7 +34,7 @@ public class BoardController {
     GET -> 목록 : 모든 게시판 조회 후 목록 페이지로 이동
     @GetMapping("")
     public String getAllBoards(Model model) {
-        List<BoardEntity> boards = boardService.getAllBoards();
+        List<Board> boards = boardService.getAllBoards();
         model.addAttribute("boards", boards);
         return "board/listBoards";  // listBoards.html로 이동
     }
@@ -46,7 +47,7 @@ public class BoardController {
                                @RequestParam(value = "sortField", defaultValue = "createdAt") String sortField,
                                @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir,
                                @RequestParam(value = "keyword", required = false) String keyword) {
-        Page<BoardEntity> boards = boardService.getBoards(page, size, sortField, sortDir, keyword);
+        Page<Board> boards = boardService.getBoards(page, size, sortField, sortDir, keyword);
         model.addAttribute("boards", boards.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", boards.getTotalPages());
@@ -59,9 +60,9 @@ public class BoardController {
     // GET {id} -> 조회 : ID로 게시판 조회 후 상세 페이지로 이동
     @GetMapping("/{id}")
     public String getBoard(@PathVariable("id") Integer id, Model model) {
-        BoardEntity board = boardService.getBoard(id);
+        Board board = boardService.getBoard(id);
         model.addAttribute("board", board);
-        return "board/viewBoardEntity";  // viewBoardEntity.html로 이동
+        return "board/viewBoard";  // viewBoard.html로 이동
     }
 
     // GET create -> 작성 : Create form 페이지로 이동
@@ -75,7 +76,7 @@ public class BoardController {
         }
 
         model.addAttribute("userId", userId);
-        return "board/createBoardEntity"; // createBoardEntity.html로 이동
+        return "board/createBoard"; // createBoard.html로 이동
     }
 
     @PostMapping("/create")
@@ -102,9 +103,9 @@ public class BoardController {
             return "redirect:/login";
         }
 
-        BoardEntity board = boardService.getBoard(id);
+        Board board = boardService.getBoard(id);
         model.addAttribute("board", board);
-        return "board/editBoardEntity";
+        return "board/editBoard";
     }
 
     @GetMapping("/edit/validate/{id}")
@@ -116,7 +117,7 @@ public class BoardController {
             return boardUtils.buildRedirectLogin(sessionUserId);
         }
 
-        BoardEntity board = boardService.getBoard(id);
+        Board board = boardService.getBoard(id);
         Integer authorUserId = board.getUser().getId();
 
         if (!authorUserId.equals(sessionUserId)) {
@@ -151,7 +152,7 @@ public class BoardController {
             return boardUtils.buildRedirectLogin(sessionUserId);
         }
 
-//        BoardEntity board = boardService.getBoard(id);
+//        Board board = boardService.getBoard(id);
 //        Integer authorUserId = board.getUser().getId();
 
         // 먼저 게시판에 속한 게시글들을 삭제

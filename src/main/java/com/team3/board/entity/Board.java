@@ -1,6 +1,8 @@
-package com.team3.board;
+package com.team3.board.entity;
 
-import com.team3.post.entity.PostEntity;
+import com.fasterxml.jackson.databind.ser.Serializers;
+import com.team3.global.entity.BaseTimeEntity;
+import com.team3.post.entity.Post;
 import com.team3.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -9,7 +11,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,7 +22,7 @@ import java.util.List;
 @Data
 @Builder
 //@EntityListeners(AuditingEntityListener.class)
-public class BoardEntity {
+public class Board extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,19 +40,7 @@ public class BoardEntity {
     private User user;  // User와의 관계 설정
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<PostEntity> posts;  // 일대다 관계를 위해 List로 변경
-
-//    @Column(name = "created_at", nullable = false)
-//    private LocalDateTime createdAt;
-//
-//    @Column(name = "updated_at", nullable = true)
-//    private LocalDateTime updatedAt;
-
-    @CreatedDate
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
+    private List<Post> posts;  // 일대다 관계를 위해 List로 변경
 
     @Column(name = "deleted_at", nullable = true)
     private LocalDateTime deletedAt;

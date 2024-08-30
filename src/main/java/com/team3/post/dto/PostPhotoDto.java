@@ -1,4 +1,4 @@
-package com.team3.post.entity;
+package com.team3.post.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

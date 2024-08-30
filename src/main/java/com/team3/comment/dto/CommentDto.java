@@ -1,10 +1,10 @@
-package com.team3.comment.entity;
+package com.team3.comment.dto;
 
 import lombok.Getter;
 import lombok.Setter;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
+
 @Getter
 @Setter
 public class CommentDto {

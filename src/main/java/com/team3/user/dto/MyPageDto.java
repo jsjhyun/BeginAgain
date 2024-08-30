@@ -1,5 +1,6 @@
-package com.team3.user.entity;
+package com.team3.user.dto;
 
+import com.team3.user.entity.User;
 import lombok.*;
 
 @Getter

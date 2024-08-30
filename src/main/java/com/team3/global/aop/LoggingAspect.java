@@ -1,4 +1,4 @@
-package com.team3.aop;
+package com.team3.global.aop;
 
 import com.team3.user.entity.User;
 import lombok.extern.slf4j.Slf4j;

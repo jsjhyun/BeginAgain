@@ -1,9 +1,9 @@
 package com.team3.comment.service;
 
 import com.team3.comment.entity.Comment;
-import com.team3.comment.entity.CommentDto;
+import com.team3.comment.dto.CommentDto;
 import com.team3.comment.repository.CommentRepository;
-import com.team3.post.entity.PostEntity;
+import com.team3.post.entity.Post;
 import com.team3.post.repository.PostRepository;
 import com.team3.user.entity.User;
 import com.team3.user.repository.UserRepository;
@@ -35,7 +35,7 @@ public class CommentService {
         User user = userRepository.findById(commentDto.getUserId())
                 .orElseThrow(() -> new NoSuchElementException("유저를 찾을 수 없습니다."));
 
-        PostEntity post = postRepository.findById(commentDto.getPostId())
+        Post post = postRepository.findById(commentDto.getPostId())
                 .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없습니다."));
 
         Comment newComment = Comment.builder()

@@ -1,13 +1,12 @@
 package com.team3.post.entity;
 
-import com.team3.board.BoardEntity;
+import com.team3.board.entity.Board;
 import com.team3.comment.entity.Comment;
 import com.team3.global.entity.BaseTimeEntity;
 import com.team3.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "post")
-public class PostEntity extends BaseTimeEntity {
+public class Post extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,7 +39,7 @@ public class PostEntity extends BaseTimeEntity {
 
     @ManyToOne
     @JoinColumn(name = "board_id", nullable = false)
-    private BoardEntity board;
+    private Board board;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<PostPhotoEntity> postPhoto = new ArrayList<>();
@@ -49,7 +48,7 @@ public class PostEntity extends BaseTimeEntity {
     private List<Comment> comments = new ArrayList<>();
 
     //게시글 create를 위한 생성자
-    public PostEntity (String title, String content, User user, BoardEntity board) {
+    public Post (String title, String content, User user, Board board) {
         this.title = title;
         this.content = content;
         this.user = user;

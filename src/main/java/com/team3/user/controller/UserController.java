@@ -1,6 +1,6 @@
 package com.team3.user.controller;
 
-import com.team3.user.entity.MyPageDto;
+import com.team3.user.dto.MyPageDto;
 import com.team3.user.exception.NicknameExistsException;
 import com.team3.user.service.UserServiceImpl;
 import jakarta.servlet.http.HttpSession;
@@ -22,12 +22,12 @@ public class UserController {
         Integer sessionUserId = (Integer) session.getAttribute("userId");
 
         if (sessionUserId == null || !sessionUserId.equals(userId)) {
-            return "redirect:/login";
+            return "redirect:/user/login";
         }
 
         MyPageDto userMyPageDto = userService.getMyPageById(userId);
         model.addAttribute("userMyPageDto", userMyPageDto);
-        return "mypage";
+        return "user/mypage";
     }
 
     // 회원 탈퇴 처리
@@ -49,8 +49,8 @@ public class UserController {
             model.addAttribute("nicknameError", e.getMessage());
             MyPageDto userMyPageDto = userService.getMyPageById(userId);
             model.addAttribute("userMyPageDto", userMyPageDto);
-            return "mypage";
+            return "user/mypage";
         }
-        return "redirect:/mypage/" +userId;
+        return "redirect:user/mypage/" +userId;
     }
 }

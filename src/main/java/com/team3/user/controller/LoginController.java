@@ -1,7 +1,7 @@
 package com.team3.user.controller;
 
 import com.team3.user.entity.User;
-import com.team3.user.entity.UserLoginDto;
+import com.team3.user.dto.UserLoginDto;
 import com.team3.user.service.UserServiceImpl;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ public class LoginController {
     // 로그인 페이지 이동
     @GetMapping("/login")
     public String loginForm() {
-        return "login";
+        return "user/login";
     }
     // 로그인 요청 처리
     @PostMapping("/login")

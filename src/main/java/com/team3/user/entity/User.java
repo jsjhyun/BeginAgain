@@ -1,9 +1,9 @@
 package com.team3.user.entity;
 
-import com.team3.board.BoardEntity;
+import com.team3.board.entity.Board;
 import com.team3.comment.entity.Comment;
 import com.team3.global.entity.BaseTimeEntity;
-import com.team3.post.entity.PostEntity;
+import com.team3.post.entity.Post;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -37,13 +37,13 @@ public class User extends BaseTimeEntity {
     private RoleType role; // ADMIN, USER
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PostEntity> posts = new ArrayList<>();
+    private List<Post> posts = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BoardEntity> boards = new ArrayList<>();
+    private List<Board> boards = new ArrayList<>();
 
     @Builder
     public User(String email, String password, String username, String nickname, RoleType role) {

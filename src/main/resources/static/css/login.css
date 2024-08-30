@@ -1,5 +1,5 @@
 .gradient-custom {
-    background: url('../images/background_blue.png') no-repeat center center fixed;
+    background: url('../images/background/background_login.png') no-repeat center center fixed;
     background-size: cover; /* 이미지를 화면에 꽉 채우도록 설정 */
     color: white;
     font-family: 'Poppins', sans-serif; /* Poppins 폰트 적용 */

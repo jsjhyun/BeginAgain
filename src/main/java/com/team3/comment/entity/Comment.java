@@ -1,7 +1,7 @@
 package com.team3.comment.entity;
 
 import com.team3.global.entity.BaseTimeEntity;
-import com.team3.post.entity.PostEntity;
+import com.team3.post.entity.Post;
 import com.team3.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -32,10 +32,10 @@ public class Comment extends BaseTimeEntity {
 
     @ManyToOne
     @JoinColumn(name = "post_id")
-    private PostEntity post;
+    private Post post;
 
 
-    public Comment(String content, User user, PostEntity post) {
+    public Comment(String content, User user, Post post) {
         this.content = content;
         this.user = user;
         this.post = post;

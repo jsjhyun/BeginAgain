@@ -1,4 +1,4 @@
-package com.team3.user.entity;
+package com.team3.user.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

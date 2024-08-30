@@ -1,4 +1,4 @@
-package com.team3.post.config;
+package com.team3.global.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;

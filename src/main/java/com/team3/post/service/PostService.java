@@ -1,9 +1,9 @@
 package com.team3.post.service;
 
-import com.team3.board.BoardEntity;
-import com.team3.board.BoardRepository;
-import com.team3.post.entity.PostDto;
-import com.team3.post.entity.PostEntity;
+import com.team3.board.entity.Board;
+import com.team3.board.repository.BoardRepository;
+import com.team3.post.dto.PostDto;
+import com.team3.post.entity.Post;
 import com.team3.post.entity.PostPhotoEntity;
 import com.team3.post.repository.PostPhotoRepository;
 import com.team3.post.repository.PostRepository;
@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.sql.Timestamp;
 import java.util.*;
 
 @Service
@@ -47,15 +46,15 @@ public class PostService {
         User user = userRepository.findById(postDto.getUserId())
                 .orElseThrow(() -> new NoSuchElementException("유저를 찾을 수 없습니다."));
 
-        BoardEntity board = boardRepository.findById(postDto.getBoardId())
+        Board board = boardRepository.findById(postDto.getBoardId())
                 .orElseThrow(() -> new NoSuchElementException("게시판을 찾을 수 없습니다."));
 
-        PostEntity newPost = PostEntity.builder()
+        Post newPost = Post.builder()
                 .title(postDto.getTitle())
                 .content(postDto.getContent())
                 .views(0)
                 .user(user) // Convert postDto.getUserId() to User entity as needed
-                .board(board) // Convert postDto.getBoardId() to BoardEntity as needed
+                .board(board) // Convert postDto.getBoardId() to Board as needed
                 .build();
 
 
@@ -98,7 +97,7 @@ public class PostService {
 
         Pageable pageable = PageRequest.of(page, pageSize,
                 Sort.by(ascending ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy));
-        Page<PostEntity> pageResult = postRepository.findByBoard_BoardId(boardId, pageable);
+        Page<Post> pageResult = postRepository.findByBoard_BoardId(boardId, pageable);
 
         return pageResult.map(PostDto::new);
     }
@@ -106,13 +105,13 @@ public class PostService {
     //최신 업데이트 순 정렬
     public List<PostDto> getPostsByBoardIdUpdatedAtDesc(Integer boardId) {
         //boardId에 해당하는 게시글 목록을 DB에서 조회
-        List<PostEntity> posts = postRepository.findByBoard_BoardIdOrderByUpdatedAtDesc(boardId);
+        List<Post> posts = postRepository.findByBoard_BoardIdOrderByUpdatedAtDesc(boardId);
 
         //PostDto 객체를 담을 리스트 생성
         List<PostDto> postDtos = new ArrayList<>();
 
         // 조회한 게시글 목록 루프 돌면서 postDtos에 추가
-        for (PostEntity post : posts) {
+        for (Post post : posts) {
             PostDto postDto = new PostDto();
             postDto.setPostId(post.getPostId());
             postDto.setTitle(post.getTitle());
@@ -133,13 +132,13 @@ public class PostService {
 
     //키워드(글의 내용) 검색을 통한 목록 조회
     public List<PostDto> getPostsBySearch(Integer boardId, String keyword) {
-        List<PostEntity> posts = postRepository.searchByContent(boardId, keyword);
+        List<Post> posts = postRepository.searchByContent(boardId, keyword);
 
         //PostDto 객체를 담을 리스트 생성
         List<PostDto> postDtos = new ArrayList<>();
 
         // 조회한 게시글 목록 루프 돌면서 postDtos에 추가
-        for (PostEntity post : posts) {
+        for (Post post : posts) {
             PostDto postDto = new PostDto();
             postDto.setPostId(post.getPostId());
             postDto.setTitle(post.getTitle());
@@ -161,13 +160,13 @@ public class PostService {
     //조회순 정렬
     public List<PostDto> getPostsByBoardIdViewsDesc(Integer boardId) {
         //boardId에 해당하는 게시글 목록을 DB에서 조회
-        List<PostEntity> posts = postRepository.findByBoard_BoardIdOrderByViewsDesc(boardId);
+        List<Post> posts = postRepository.findByBoard_BoardIdOrderByViewsDesc(boardId);
 
         //PostDto 객체를 담을 리스트 생성
         List<PostDto> postDtos = new ArrayList<>();
 
         // 조회한 게시글 목록 루프 돌면서 postDtos에 추가
-        for (PostEntity post : posts) {
+        for (Post post : posts) {
             PostDto postDto = new PostDto();
             postDto.setPostId(post.getPostId());
             postDto.setTitle(post.getTitle());
@@ -187,7 +186,7 @@ public class PostService {
     }
 
     public void incrementViews(Integer postId) {
-        PostEntity post = postRepository.findById(postId)
+        Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없습니다."));
 
         post.setViews(post.getViews() + 1);
@@ -195,8 +194,8 @@ public class PostService {
     }
 
     //postId에 따른 게시글 단건 조회
-    public PostEntity getPostByPostId(Integer postId) {
-        PostEntity post = postRepository.findById(postId)
+    public Post getPostByPostId(Integer postId) {
+        Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없습니다."));
 
         return post;
@@ -205,7 +204,7 @@ public class PostService {
     //게시글 수정
     public void modifyPost(PostDto postDto) {
 
-        PostEntity post = postRepository.findById(postDto.getPostId())
+        Post post = postRepository.findById(postDto.getPostId())
                 .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없습니다."));
 
         post.setTitle(postDto.getTitle());
@@ -216,7 +215,7 @@ public class PostService {
 
     //게시글 삭제
     public void deletePost(Integer postId) {
-        PostEntity post = postRepository.findById(postId)
+        Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없습니다."));
 
         postRepository.delete(post);
@@ -235,7 +234,7 @@ public class PostService {
     // boardId로 모든 게시글을 삭제하는 메서드
     @Transactional
     public void deletePostsByBoardId(Integer boardId) {
-        List<PostEntity> posts = postRepository.findByBoard_BoardId(boardId);
+        List<Post> posts = postRepository.findByBoard_BoardId(boardId);
         if (!posts.isEmpty()) {
             postRepository.deleteAll(posts);
         }
