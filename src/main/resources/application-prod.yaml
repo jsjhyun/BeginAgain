@@ -1,5 +1,5 @@
 server:
-  port: 5000
+  port: 5555
 
 spring:
   jpa:
@@ -8,6 +8,8 @@ spring:
     properties:
       hibernate:
         format_sql: true
+    hibernate:
+      ddl-auto: none
   datasource:
     url: jdbc:mysql://localhost:3306/cloud4?useUnicode=true&serverTimezone=Asia/Seoul
     driver-class-name: com.mysql.cj.jdbc.Driver

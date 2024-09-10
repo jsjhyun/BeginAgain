@@ -4,31 +4,25 @@ import com.team3.board.dto.CreateBoardDto;
 import com.team3.board.dto.UpdateBoardDTO;
 import com.team3.board.entity.Board;
 import com.team3.board.repository.BoardRepository;
-import com.team3.global.exception.CustomException;
+import com.team3.board.exception.CustomException;
 import com.team3.user.entity.User;
 import com.team3.user.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import static com.team3.global.exception.ErrorCode.USER_NOT_AUTHENTICATED;
+import static com.team3.global.error.ErrorCode.USER_NOT_AUTHENTICATED;
 
 @Service
+@RequiredArgsConstructor
 public class BoardService {
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;  // UserService 대신 UserRepository 사용
-
-    @Autowired
-    public BoardService(BoardRepository boardRepository, UserRepository userRepository) {
-        this.boardRepository = boardRepository;
-        this.userRepository = userRepository;
-    }
 
     // 게시판 생성
     public Board addBoard(CreateBoardDto createBoardDto) {
@@ -41,7 +35,6 @@ public class BoardService {
                 .title(createBoardDto.getTitle())
                 .content(createBoardDto.getContent())
                 .user(user) // 연관된 User 엔티티 설정
-                //.createdAt(LocalDateTime.now()) // 생성일자 설정
                 .isDeleted(false) // 삭제 여부 false로 설정
                 .build();
 
@@ -50,7 +43,7 @@ public class BoardService {
     }
 
     // 반복적인 게시판 조회 코드를 줄이기 위해 공통 메서드 추가
-    private Board findExistingBoard(Integer boardId) {
+    private Board findExistingBoard(Long boardId) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new NoSuchElementException("게시판을 찾을 수 없습니다."));
 
@@ -62,7 +55,7 @@ public class BoardService {
     }
 
     // 게시판 상세 조회
-    public Board getBoard(Integer boardId) {
+    public Board getBoard(Long boardId) {
         return findExistingBoard(boardId);
     }
 
@@ -78,7 +71,7 @@ public class BoardService {
         Pageable pageable = PageRequest.of(page, size, sort);
 
         if (keyword != null && !keyword.isEmpty()) {
-            return boardRepository.searchByKeywordAndIsDeletedFalse(keyword, pageable);
+            return boardRepository.searchByKeyword(keyword, pageable);
         } else {
             return boardRepository.findByIsDeletedFalse(pageable);
         }
@@ -86,7 +79,7 @@ public class BoardService {
 
 
     // 게시판 수정
-    public Board updateBoard(Integer boardId, Integer currentUserId, UpdateBoardDTO updateBoardDTO) {
+    public Board updateBoard(Long boardId, Long currentUserId, UpdateBoardDTO updateBoardDTO) {
         // 공통 메서드를 사용하여 기존 게시판 조회
         Board existingBoard = findExistingBoard(boardId);
 
@@ -95,23 +88,16 @@ public class BoardService {
         }
 
         // 업데이트할 필드만 설정
-        if (updateBoardDTO.getTitle() != null) {
-            existingBoard.setTitle(updateBoardDTO.getTitle());
+        if (!updateBoardDTO.getTitle().isEmpty() && !updateBoardDTO.getContent().isEmpty()) {
+            existingBoard.updateBoard(updateBoardDTO.getTitle(), updateBoardDTO.getContent());
         }
-        if (updateBoardDTO.getContent() != null) {
-            existingBoard.setContent(updateBoardDTO.getContent());
-        }
-
-        // 수정일자 업데이트
-      //  existingBoard.setUpdatedAt(LocalDateTime.now());
-
         // 수정된 게시판 저장
         return boardRepository.save(existingBoard);
     }
 
 
     // 게시판 삭제
-    public Board deleteBoard(Integer boardId, Integer currentUserId) {
+    public Board deleteBoard(Long boardId, Long currentUserId) {
 
         // 공통 메서드를 사용하여 기존 게시판 조회
         Board existingBoard = findExistingBoard(boardId);
@@ -120,9 +106,8 @@ public class BoardService {
             throw new CustomException(USER_NOT_AUTHENTICATED);
         }
 
-
         // 삭제일자 업데이트
-        existingBoard.setDeletedAt(LocalDateTime.now());
+        existingBoard.deleteBoard();
 
         return boardRepository.save(existingBoard);
     }

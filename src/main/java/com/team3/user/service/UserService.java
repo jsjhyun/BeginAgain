@@ -13,11 +13,11 @@ public interface UserService {
     User signup(UserSignupDto signupDto);
 
     // 회원 정보 조회 메서드
-    MyPageDto getMyPageById(Integer userId);
+    MyPageDto getMyPageById(Long userId);
 
     // 닉네임 수정 메서드
-    void updateNickname(Integer userId, String newNickname);
+    void updateNickname(Long userId, String newNickname);
 
     // 회원 삭제 메서드
-    void deleteUserById(Integer userId);
+    void deleteUserById(Long userId);
 }

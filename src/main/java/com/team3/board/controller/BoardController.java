@@ -7,7 +7,7 @@ import com.team3.board.entity.Board;
 import com.team3.board.service.BoardService;
 import com.team3.post.service.PostService;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,18 +17,12 @@ import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/board")
+@RequiredArgsConstructor
 public class BoardController {
 
     private final BoardService boardService;
     private final PostService postService; // PostService 추가
     private final BoardUtils boardUtils;
-
-    @Autowired
-    public BoardController(BoardService boardService, PostService postService, BoardUtils boardUtils) {
-        this.boardService = boardService;
-        this.postService = postService; // PostService 초기화
-        this.boardUtils = boardUtils;
-    }
 
     /*
     GET -> 목록 : 모든 게시판 조회 후 목록 페이지로 이동
@@ -40,7 +34,7 @@ public class BoardController {
     }
     */
 
-    @GetMapping("")
+    @GetMapping
     public String getAllBoards(Model model,
                                @RequestParam(value = "page", defaultValue = "0") int page,
                                @RequestParam(value = "size", defaultValue = "9") int size,
@@ -59,7 +53,7 @@ public class BoardController {
 
     // GET {id} -> 조회 : ID로 게시판 조회 후 상세 페이지로 이동
     @GetMapping("/{id}")
-    public String getBoard(@PathVariable("id") Integer id, Model model) {
+    public String getBoard(@PathVariable("id") Long id, Model model) {
         Board board = boardService.getBoard(id);
         model.addAttribute("board", board);
         return "board/viewBoard";  // viewBoard.html로 이동
@@ -69,7 +63,7 @@ public class BoardController {
     @GetMapping("/create")
     public String showCreateBoardForm(HttpSession session, Model model) {
 
-        Integer userId = boardUtils.checkUserSession(session);
+        Long userId = boardUtils.checkUserSession(session);
         // 만약 userId가 null이면 로그인 페이지로 리다이렉트
         if (userId == null) {
             return "redirect:/login";
@@ -82,7 +76,7 @@ public class BoardController {
     @PostMapping("/create")
     public ResponseEntity<String> createEntity(@RequestBody CreateBoardDto createBoardDto, HttpSession session) {
 
-        Integer sessionUserId = boardUtils.checkUserSession(session);
+        Long sessionUserId = boardUtils.checkUserSession(session);
         // userId가 null인지 체크하고, null일 경우 로그인
         if (sessionUserId == null) {
             return boardUtils.buildRedirectLogin(sessionUserId);
@@ -95,9 +89,9 @@ public class BoardController {
 
     // GET edit/{id} -> 수정 : 게시판 수정 폼으로 이동
     @GetMapping("/edit/{id}")
-    public String showEditBoardForm(@PathVariable("id") Integer id, Model model, HttpSession session) {
+    public String showEditBoardForm(@PathVariable("id") Long id, Model model, HttpSession session) {
 
-        Integer sessionUserId = boardUtils.checkUserSession(session);
+        Long sessionUserId = boardUtils.checkUserSession(session);
         // userId가 null인지 체크하고, null일 경우 로그인
         if (sessionUserId == null) {
             return "redirect:/login";
@@ -109,16 +103,16 @@ public class BoardController {
     }
 
     @GetMapping("/edit/validate/{id}")
-    public ResponseEntity<String> validateEditBoardForm(@PathVariable("id") Integer id, HttpSession session) {
+    public ResponseEntity<String> validateEditBoardForm(@PathVariable("id") Long id, HttpSession session) {
 
-        Integer sessionUserId = boardUtils.checkUserSession(session);
+        Long sessionUserId = boardUtils.checkUserSession(session);
         // userId가 null인지 체크하고, null일 경우 로그인
         if (sessionUserId == null) {
             return boardUtils.buildRedirectLogin(sessionUserId);
         }
 
         Board board = boardService.getBoard(id);
-        Integer authorUserId = board.getUser().getId();
+        Long authorUserId = board.getUser().getId();
 
         if (!authorUserId.equals(sessionUserId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유저 정보가 다릅니다.");
@@ -128,11 +122,11 @@ public class BoardController {
     }
 
     @PutMapping("/edit/{id}")
-    public ResponseEntity<String> updateBoard(@PathVariable("id") Integer id,
+    public ResponseEntity<String> updateBoard(@PathVariable("id") Long id,
                                               @RequestBody UpdateBoardDTO updateBoardDTO,
                                               HttpSession session) {
 
-        Integer sessionUserId = boardUtils.checkUserSession(session);
+        Long sessionUserId = boardUtils.checkUserSession(session);
         // userId가 null인지 체크하고, null일 경우 로그인
         if (sessionUserId == null) {
             return boardUtils.buildRedirectLogin(sessionUserId);
@@ -144,16 +138,16 @@ public class BoardController {
 
     // DELETE delete/{id} -> 삭제(DB저장)
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteBoardRest(@PathVariable("id") Integer id, HttpSession session) {
+    public ResponseEntity<String> deleteBoardRest(@PathVariable("id") Long id, HttpSession session) {
 
-        Integer sessionUserId = boardUtils.checkUserSession(session);
+        Long sessionUserId = boardUtils.checkUserSession(session);
         // userId가 null인지 체크하고, null일 경우 로그인
         if (sessionUserId == null) {
             return boardUtils.buildRedirectLogin(sessionUserId);
         }
 
 //        Board board = boardService.getBoard(id);
-//        Integer authorUserId = board.getUser().getId();
+//        Long authorUserId = board.getUser().getId();
 
         // 먼저 게시판에 속한 게시글들을 삭제
         postService.deletePostsByBoardId(id); // 게시글 삭제 추가

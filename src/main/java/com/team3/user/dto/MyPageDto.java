@@ -10,7 +10,7 @@ import lombok.*;
 @Builder
 public class MyPageDto {
 
-    private Integer id;
+    private Long id;
     private String email;
     private String username;
     private String nickname;

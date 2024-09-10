@@ -19,7 +19,7 @@ public class LoginController {
     // 로그인 페이지 이동
     @GetMapping("/login")
     public String loginForm() {
-        return "user/login";
+        return "login";
     }
     // 로그인 요청 처리
     @PostMapping("/login")

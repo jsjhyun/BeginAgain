@@ -1,6 +1,6 @@
 package com.team3.user.exception;
 
-import com.team3.global.exception.ErrorCode;
+import com.team3.global.error.ErrorCode;
 import lombok.Getter;
 
 @Getter

@@ -2,7 +2,7 @@ package com.team3.user.entity;
 
 import com.team3.board.entity.Board;
 import com.team3.comment.entity.Comment;
-import com.team3.global.entity.BaseTimeEntity;
+import com.team3.global.common.BaseTimeEntity;
 import com.team3.post.entity.Post;
 import jakarta.persistence.*;
 import lombok.*;
@@ -18,7 +18,7 @@ public class User extends BaseTimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id", updatable = false)
-    private Integer id;
+    private Long id;
 
     @Column(name = "email", nullable = false, length=200)
     private String email;

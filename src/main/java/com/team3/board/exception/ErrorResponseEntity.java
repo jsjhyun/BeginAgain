@@ -1,5 +1,6 @@
-package com.team3.global.exception;
+package com.team3.board.exception;
 
+import com.team3.global.error.ErrorCode;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.http.ResponseEntity;

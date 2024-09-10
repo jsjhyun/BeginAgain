@@ -1,18 +1,18 @@
 package com.team3.comment.dto;
 
+import com.team3.global.common.BaseTimeEntity;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.sql.Timestamp;
-
-@Getter
-@Setter
-public class CommentDto {
-    private Integer commentId;
+@Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class CommentDto extends BaseTimeEntity {
+    private Long commentId;
     private String content;
-    private Timestamp createAt;
-    private Timestamp updatedAt;
-    private Integer userId;
+    private Long userId;
     private String nickname;
-    private Integer postId;
+    private Long postId;
 }

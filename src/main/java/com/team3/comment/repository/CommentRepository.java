@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface CommentRepository extends JpaRepository<Comment, Integer> {
-    List<Comment> findByPost_PostId(Integer postId);
+public interface CommentRepository extends JpaRepository<Comment, Long> {
+    List<Comment> findByPost_PostId(Long postId);
 }

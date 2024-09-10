@@ -18,21 +18,21 @@ public class UserController {
 
     // 회원 정보 폼
     @GetMapping("/{id}")
-    public String myPageForm(@PathVariable("id") Integer userId, HttpSession session, Model model) {
-        Integer sessionUserId = (Integer) session.getAttribute("userId");
+    public String myPageForm(@PathVariable("id") Long userId, HttpSession session, Model model) {
+        Long sessionUserId = (Long) session.getAttribute("userId");
 
         if (sessionUserId == null || !sessionUserId.equals(userId)) {
-            return "redirect:/user/login";
+            return "redirect:/login";
         }
 
         MyPageDto userMyPageDto = userService.getMyPageById(userId);
         model.addAttribute("userMyPageDto", userMyPageDto);
-        return "user/mypage";
+        return "mypage";
     }
 
     // 회원 탈퇴 처리
     @PostMapping("/delete/{id}")
-    public String deleteMyPage(@PathVariable("id") Integer userId, HttpSession session) {
+    public String deleteMyPage(@PathVariable("id") Long userId, HttpSession session) {
         userService.deleteUserById(userId);
         session.invalidate();
         return "redirect:/board";
@@ -40,7 +40,7 @@ public class UserController {
 
     // 회원 정보 수정 처리
     @PostMapping("/update/{id}")
-    public String updateMyPage(@PathVariable("id") Integer userId,
+    public String updateMyPage(@PathVariable("id") Long userId,
                                @RequestParam("nickname") String newNickname,
                                Model model) {
         try {
@@ -49,8 +49,8 @@ public class UserController {
             model.addAttribute("nicknameError", e.getMessage());
             MyPageDto userMyPageDto = userService.getMyPageById(userId);
             model.addAttribute("userMyPageDto", userMyPageDto);
-            return "user/mypage";
+            return "mypage";
         }
-        return "redirect:user/mypage/" +userId;
+        return "redirect:/mypage/" +userId;
     }
 }

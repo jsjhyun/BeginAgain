@@ -66,7 +66,7 @@ public class UserServiceImpl implements UserService{
         }
     }
     // 회원 정보 조회
-    public MyPageDto getMyPageById(Integer userId) {
+    public MyPageDto getMyPageById(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을수 없습니다. " + userId));
         return new MyPageDto(user);
@@ -74,7 +74,7 @@ public class UserServiceImpl implements UserService{
 
     // 닉네임 수정
     @Transactional
-    public void updateNickname(Integer userId, String newNickname) {
+    public void updateNickname(Long userId, String newNickname) {
         if (userRepository.existsByNickname(newNickname)) {
             throw new NicknameExistsException();
         }
@@ -88,7 +88,7 @@ public class UserServiceImpl implements UserService{
 
     // 회원 삭제
     @Transactional
-    public void deleteUserById(Integer userId) {
+    public void deleteUserById(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다. ID: " + userId));
         userRepository.delete(user);

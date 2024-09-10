@@ -1,24 +1,22 @@
 package com.team3.post.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
-@Table(name = "post_photo")
 @Getter
-@Setter
+// @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostPhotoEntity {
+@Table(name = "post_photo")
+public class PostPhoto {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "post_photo_id")
-    private Integer photoId;
+    private Long photoId;
 
+    // 지연로딩 : 필요한 시점에만 Post 데이터를 가져오기 위해 -> 성능 최적
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
@@ -26,8 +24,10 @@ public class PostPhotoEntity {
     @Column(name = "image_path")
     private String imagePath;
 
-    public PostPhotoEntity(Post post, String imagePath){
+    public PostPhoto(Post post, String imagePath){
         this.post = post;
         this.imagePath = imagePath;
     }
 }
+
+

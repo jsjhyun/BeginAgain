@@ -7,11 +7,11 @@ import com.team3.comment.dto.CommentDto;
 import com.team3.comment.service.CommentService;
 import com.team3.post.dto.PostDto;
 import com.team3.post.entity.Post;
-import com.team3.post.entity.PostPhotoEntity;
+import com.team3.post.entity.PostPhoto;
 import com.team3.post.service.PostPhotoService;
 import com.team3.post.service.PostService;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,25 +23,17 @@ import java.io.IOException;
 import java.util.List;
 
 @Controller
-@RequestMapping("/post")
+@RequiredArgsConstructor
 public class PostController {
 
-    @Autowired
-    private PostService postService;
-
-    @Autowired
-    private BoardService boardService;
-
-    @Autowired
-    private CommentService commentService;
-
-    @Autowired
-    private PostPhotoService postPhotoService;
-
+    private final PostService postService;
+    private final BoardService boardService;
+    private final CommentService commentService;
+    private final PostPhotoService postPhotoService;
 
     //boardId에 따른 게시글 목록 조회
-    @GetMapping("/{boardId}")
-    public String postList(@PathVariable("boardId") Integer boardId,
+    @GetMapping("/boards/{boardId}/posts")
+    public String postList(@PathVariable("boardId") Long boardId,
                            @RequestParam(value = "page", defaultValue = "1") int pageNumber,
                            @RequestParam(value = "size", defaultValue = "10") int pageSize,
                            @RequestParam(value = "sort", defaultValue = "updatedAt") String sortBy,
@@ -66,8 +58,8 @@ public class PostController {
     }
 
     //최신 업데이트 순 정렬
-    @GetMapping("/{boardId}/updatedAt")
-    public String postListOrderByUpdatedAt(@PathVariable("boardId") Integer boardId, Model m){
+    @GetMapping("/boards/{boardId}/posts/updated")
+    public String postListOrderByUpdatedAt(@PathVariable("boardId") Long boardId, Model m){
         List<PostDto> posts = postService.getPostsByBoardIdUpdatedAtDesc(boardId);
         String boardTitle = boardService.getBoard(boardId).getTitle();
 
@@ -79,8 +71,8 @@ public class PostController {
     }
 
     //조회수 순 정렬
-    @GetMapping("/{boardId}/views")
-    public String postListOrderByViewsAt(@PathVariable("boardId") Integer boardId, Model m){
+    @GetMapping("/boards/{boardId}/posts/views")
+    public String postListOrderByViewsAt(@PathVariable("boardId") Long boardId, Model m){
         List<PostDto> posts = postService.getPostsByBoardIdViewsDesc(boardId);
         String boardTitle = boardService.getBoard(boardId).getTitle();
 
@@ -93,7 +85,7 @@ public class PostController {
 
     // 검색 기능
     @GetMapping("/{boardId}/search")
-    public String searchPost(@PathVariable("boardId") Integer boardId,
+    public String searchPost(@PathVariable("boardId") Long boardId,
                              @RequestParam("keyword") String keyword,
                              Model m){
         List<PostDto> posts = postService.getPostsBySearch(boardId, keyword);
@@ -107,16 +99,17 @@ public class PostController {
     }
 
     // 게시글 번호에 따른 게시글 조회
-    @GetMapping("/postdetail/{postId}")
-    public String postdetail(@PathVariable("postId") Integer postId,
+    @GetMapping("/posts/{postId}")
+    public String postdetail(@PathVariable("postId") Long postId,
                              Model m,
                              HttpSession session){
         //게시글 로직
         Post post = postService.getPostByPostId(postId);
-        Integer boardId = post.getBoard().getBoardId();
-        Integer currentSessionUserId = (Integer)session.getAttribute("userId");
+        Long boardId = post.getBoard().getBoardId();
+        Long currentSessionUserId = (Long)session.getAttribute("userId");
 
-        Integer userId = postService.getPostByPostId(postId).getUser().getId();
+        Long userId = postService.getPostByPostId(postId).getUser().getId();
+
         if(!postService.userCheck(currentSessionUserId, userId)) {
             m.addAttribute("user_check", "N");
         }
@@ -127,9 +120,9 @@ public class PostController {
         m.addAttribute("post", post);
 
         //게시글 사진 로직
-        List<PostPhotoEntity> postPhotos = postPhotoService.getPhotosByPostId(postId);
+        List<PostPhoto> postPhotos = postPhotoService.getPhotosByPostId(Long.valueOf(postId));
         List<String> imageUrls = postPhotos.stream()
-                .map(PostPhotoEntity::getImagePath)  // 파일 경로를 가져와서 URL로 변환
+                .map(PostPhoto::getImagePath)  // 파일 경로를 가져와서 URL로 변환
                 .toList();
 
         m.addAttribute("imageUrls", imageUrls);
@@ -143,12 +136,12 @@ public class PostController {
     }
 
     //댓글 생성
-    @PostMapping("/comment/create")
-    public String createComment(@RequestParam("postId")Integer postId,
+    @PostMapping("/posts/{postId}/comments")
+    public String createComment(@RequestParam("postId")Long postId,
                                 CommentDto commentDto,
                                 HttpSession session){
 
-        Integer userId = (Integer)session.getAttribute("userId");
+        Long userId = (Long)session.getAttribute("userId");
         commentDto.setUserId(userId);
         commentDto.setPostId(postId);
 
@@ -158,10 +151,10 @@ public class PostController {
         return "redirect:/post/postdetail/"+postId;
     }
 
-    //댓글 수정
-    @GetMapping("/comment/modify")
-    public String updateComment(@RequestParam("commentId") Integer commentId,
-                                @RequestParam("postId") Integer postId,
+    //댓글 수정 페이지 제공
+    @GetMapping("/comments/{commentId}/edit")
+    public String editCommentForm(@RequestParam("commentId") Long commentId,
+                                @RequestParam("postId") Long postId,
                                 Model m){
 
         Comment comment = commentService.getCommentById(commentId);
@@ -172,11 +165,11 @@ public class PostController {
         return "post/comment_modify";
     }
 
-    //댓글 수정
-    @PostMapping("/comment/modify")
-    public String updateComment(@RequestParam("commentId") Integer commentId,
+    //댓글 수정 처리
+    @PutMapping("/comments/{commentId}")
+    public String updateComment(@RequestParam("commentId") Long commentId,
                                 @RequestParam("content") String content,
-                                @RequestParam("postId") Integer postId){
+                                @RequestParam("postId") Long postId){
 
         commentService.modifyComment(commentId,content);
 
@@ -184,14 +177,14 @@ public class PostController {
     }
 
     //댓글 삭제
-    @PostMapping("/comment/delete")
-    public String deleteComment(@RequestParam("commentId") Integer commentId,
-                                @RequestParam("postId") Integer postId,
+    @DeleteMapping("/comments/{commentId}")
+    public String deleteComment(@RequestParam("commentId") Long commentId,
+                                @RequestParam("postId") Long postId,
                                 RedirectAttributes rattr,
                                 HttpSession session){
 
-        Integer userId = commentService.getCommentById(commentId).getUser().getId();
-        Integer currentUserId = (Integer) session.getAttribute("userId");
+        Long userId = commentService.getCommentById(commentId).getUser().getId();
+        Long currentUserId = (Long) session.getAttribute("userId");
 
         commentService.deleteComment(commentId);
 
@@ -199,14 +192,14 @@ public class PostController {
     }
 
     //게시글 작성
-    @PostMapping("/create")
-    public String createPost(@RequestParam("boardId") Integer boardId,
+    @PostMapping("/boards/{boardId}/posts")
+    public String createPost(@RequestParam("boardId") Long boardId,
                              @RequestParam("images") List<MultipartFile> images,
                              PostDto postDto,
                              HttpSession session){
 
         //로그인한 사용자의 세션을 postDto에 set
-        Integer userId = (Integer)session.getAttribute("userId");
+        Long userId = (Long)session.getAttribute("userId");
         postDto.setUserId(userId);
         postDto.setBoardId(boardId);
 
@@ -222,7 +215,7 @@ public class PostController {
 
     //게시판번호에 따른 게시글 작성페이지 이동
     @GetMapping("/create/{boardId}")
-    public String createPostForm(@PathVariable("boardId") Integer boardId,
+    public String createPostForm(@PathVariable("boardId") Long boardId,
                                  Model m,
                                  RedirectAttributes rattr,
                                  HttpSession session){
@@ -239,16 +232,16 @@ public class PostController {
 
 
     //게시글 번호에 따른 게시글 수정 페이지
-    @GetMapping("/modify/{postId}")
-    public String modifyForm(@PathVariable("postId") Integer postId,
+    @GetMapping("/posts/{postId}/edit")
+    public String modifyForm(@PathVariable("postId") Long postId,
                              Model m,
                              RedirectAttributes rattr,
                              HttpSession session){
 
-        Integer userId = postService.getPostByPostId(postId).getUser().getId();
+        Long userId = postService.getPostByPostId(postId).getUser().getId();
 
         //글 작성자가 맞으면 수정페이지로 이동, 아니면 메시지 띄운 후 다시 게시글 페이지로
-        if(postService.userCheck((Integer)session.getAttribute("userId"), userId)){
+        if(postService.userCheck((Long)session.getAttribute("userId"), userId)){
             Post post = postService.getPostByPostId(postId);
 
             m.addAttribute("post", post);
@@ -260,8 +253,8 @@ public class PostController {
     }
 
     //게시글 번호에 따른 게시글 수정
-    @PostMapping("/modify/{postId}")
-    public String modifyPost(@PathVariable("postId") Integer postId,
+    @PutMapping("/posts/{postId}")
+    public String modifyPost(@PathVariable("postId") Long postId,
                              PostDto postDto){
 
         postService.modifyPost(postDto);
@@ -270,17 +263,17 @@ public class PostController {
     }
 
     //게시글 번호에 따른 게시글 삭제
-    @PostMapping("/delete/{postId}")
-    public String deletePost(@PathVariable("postId") Integer postId,
-                             @RequestParam("boardId") Integer boardId,
+    @DeleteMapping("/posts/{postId}")
+    public String deletePost(@PathVariable("postId") Long postId,
+                             @RequestParam("boardId") Long boardId,
                              RedirectAttributes rattr,
                              Model m,
                              HttpSession session){
 
-        Integer userId = postService.getPostByPostId(postId).getUser().getId();
+        Long userId = postService.getPostByPostId(postId).getUser().getId();
 
         //글 작성자가 맞으면 삭제 반영, 아니면 메시지 띄운 후 다시 게시글 페이지로
-        if(postService.userCheck((Integer)session.getAttribute("userId"), userId)){
+        if(postService.userCheck((Long)session.getAttribute("userId"), userId)){
             commentService.deleteCommentsByPostId(postId);
             postService.deletePost(postId);
 

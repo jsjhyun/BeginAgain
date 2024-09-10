@@ -1,13 +1,21 @@
 package com.team3.global.exception;
 
+import com.team3.board.exception.CustomException;
+import com.team3.board.exception.ErrorResponseEntity;
 import com.team3.user.dto.UserSignupDto;
 import com.team3.user.exception.*;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(CustomException.class)
+    protected ResponseEntity<ErrorResponseEntity> handleCustomException(CustomException e) {
+        return ErrorResponseEntity.toResponseEntity(e.getErrorCode());
+    }
 
     @ExceptionHandler(EmailNotFoundException.class)
     public String handleEmailNotFoundException(EmailNotFoundException ex, Model model) {

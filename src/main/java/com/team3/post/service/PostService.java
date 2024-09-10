@@ -4,12 +4,13 @@ import com.team3.board.entity.Board;
 import com.team3.board.repository.BoardRepository;
 import com.team3.post.dto.PostDto;
 import com.team3.post.entity.Post;
-import com.team3.post.entity.PostPhotoEntity;
+import com.team3.post.entity.PostPhoto;
 import com.team3.post.repository.PostPhotoRepository;
 import com.team3.post.repository.PostRepository;
 import com.team3.user.entity.User;
 import com.team3.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -23,6 +24,7 @@ import java.io.*;
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class PostService {
 
     @Value("${spring.servlet.multipart.location:C:/uploads/}")
@@ -32,13 +34,6 @@ public class PostService {
     private final PostPhotoRepository postPhotoRepository;
     private final UserRepository userRepository;
     private final BoardRepository boardRepository;
-
-    public PostService(PostRepository postRepository, PostPhotoRepository postPhotoRepository, UserRepository userRepository, BoardRepository boardRepository) {
-        this.postRepository = postRepository;
-        this.postPhotoRepository = postPhotoRepository;
-        this.userRepository = userRepository;
-        this.boardRepository = boardRepository;
-    }
 
     //게시글 생성
     public void createPost(PostDto postDto, List<MultipartFile> images) throws IOException {
@@ -52,11 +47,10 @@ public class PostService {
         Post newPost = Post.builder()
                 .title(postDto.getTitle())
                 .content(postDto.getContent())
-                .views(0)
+               // .views(0L)
                 .user(user) // Convert postDto.getUserId() to User entity as needed
                 .board(board) // Convert postDto.getBoardId() to Board as needed
                 .build();
-
 
         postRepository.save(newPost);
 
@@ -83,8 +77,8 @@ public class PostService {
 
                     String webPath = "/uploads/" + uuidFileName;
 
-                    PostPhotoEntity postPhotoEntity = new PostPhotoEntity(newPost, webPath);
-                    postPhotoRepository.save(postPhotoEntity);
+                    PostPhoto PostPhoto = new PostPhoto(newPost, webPath);
+                    postPhotoRepository.save(PostPhoto);
                 }
             }
         }
@@ -92,7 +86,7 @@ public class PostService {
 
 
     //BoardId에 따른 게시글리스트 조회
-    public Page<PostDto> getPostsByBoardId(Integer boardId, int pageNumber, int pageSize, String sortBy, boolean ascending) {
+    public Page<PostDto> getPostsByBoardId(Long boardId, int pageNumber, int pageSize, String sortBy, boolean ascending) {
         int page = Math.max(0, pageNumber - 1);
 
         Pageable pageable = PageRequest.of(page, pageSize,
@@ -103,7 +97,7 @@ public class PostService {
     }
 
     //최신 업데이트 순 정렬
-    public List<PostDto> getPostsByBoardIdUpdatedAtDesc(Integer boardId) {
+    public List<PostDto> getPostsByBoardIdUpdatedAtDesc(Long boardId) {
         //boardId에 해당하는 게시글 목록을 DB에서 조회
         List<Post> posts = postRepository.findByBoard_BoardIdOrderByUpdatedAtDesc(boardId);
 
@@ -131,7 +125,7 @@ public class PostService {
     }
 
     //키워드(글의 내용) 검색을 통한 목록 조회
-    public List<PostDto> getPostsBySearch(Integer boardId, String keyword) {
+    public List<PostDto> getPostsBySearch(Long boardId, String keyword) {
         List<Post> posts = postRepository.searchByContent(boardId, keyword);
 
         //PostDto 객체를 담을 리스트 생성
@@ -158,7 +152,7 @@ public class PostService {
     }
 
     //조회순 정렬
-    public List<PostDto> getPostsByBoardIdViewsDesc(Integer boardId) {
+    public List<PostDto> getPostsByBoardIdViewsDesc(Long boardId) {
         //boardId에 해당하는 게시글 목록을 DB에서 조회
         List<Post> posts = postRepository.findByBoard_BoardIdOrderByViewsDesc(boardId);
 
@@ -185,16 +179,17 @@ public class PostService {
         return postDtos;
     }
 
-    public void incrementViews(Integer postId) {
+    // 조회 수 증가
+    public void incrementViews(Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없습니다."));
 
-        post.setViews(post.getViews() + 1);
+        post.incrementViews();
         postRepository.save(post);
     }
 
     //postId에 따른 게시글 단건 조회
-    public Post getPostByPostId(Integer postId) {
+    public Post getPostByPostId(Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없습니다."));
 
@@ -207,14 +202,12 @@ public class PostService {
         Post post = postRepository.findById(postDto.getPostId())
                 .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없습니다."));
 
-        post.setTitle(postDto.getTitle());
-        post.setContent(postDto.getContent());
-
+        post.updatePost(postDto.getTitle(), postDto.getContent());
         postRepository.save(post);
     }
 
     //게시글 삭제
-    public void deletePost(Integer postId) {
+    public void deletePost(Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없습니다."));
 
@@ -222,7 +215,7 @@ public class PostService {
     }
 
     // 수정 or 삭제하려는 글의 작성자인지 아닌지 체크하는 메서드
-    public boolean userCheck(Integer sessionId, Integer userId) {
+    public boolean userCheck(Long sessionId, Long userId) {
 
         if (Objects.equals(sessionId, userId)) {
             return true;
@@ -233,7 +226,7 @@ public class PostService {
     // post service : 특정 BoardId를 가진 게시글들을 일괄 삭제
     // boardId로 모든 게시글을 삭제하는 메서드
     @Transactional
-    public void deletePostsByBoardId(Integer boardId) {
+    public void deletePostsByBoardId(Long boardId) {
         List<Post> posts = postRepository.findByBoard_BoardId(boardId);
         if (!posts.isEmpty()) {
             postRepository.deleteAll(posts);

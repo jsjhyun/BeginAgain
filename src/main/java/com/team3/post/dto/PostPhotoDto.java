@@ -7,13 +7,11 @@ import lombok.Setter;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
+@Getter @Setter
 public class PostPhotoDto {
-    private Integer photoId;
-    private Integer postId;
+    private Long photoId;
+    private Long postId;
     private String imagePath;
-
 }
 
 
