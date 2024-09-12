@@ -13,8 +13,8 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/cloud4?useUnicode=true&serverTimezone=Asia/Seoul
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: hyun
-    password: gusgus9836!
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   servlet:
     multipart:
       max-file-size: 10MB
