@@ -30,8 +30,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'io.micrometer:micrometer-registry-prometheus'
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 	implementation 'org.mindrot:jbcrypt:0.4'
-	implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.4.0'
+	implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.4.0' // swagger
 	compileOnly 'org.projectlombok:lombok'
 	implementation 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok'

@@ -1,6 +1,7 @@
 package com.team3.user.controller;
 
 import com.team3.user.dto.UserSignupDto;
+import com.team3.user.exception.EmailExistsException;
 import com.team3.user.service.UserServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,7 @@ public class SignupController {
         try {
             userService.signup(userSignupDto);
             return "redirect:/login";
-        } catch (IllegalArgumentException e) {
+        } catch (RuntimeException e) {
             model.addAttribute("signupError", e.getMessage()); // 사용자에게 회원가입 실패 이유 전달
             model.addAttribute("userSignupDto", userSignupDto); // 입력 데이터 유지
             return "signup";
