@@ -32,7 +32,7 @@ public class SignupController {
         // 유효성 검사
         if (bindingResult.hasErrors()) {
             model.addAttribute("userSignupDto", userSignupDto);
-            return "signup";
+            return "signup"; // 검증에 실패하면 다시 회원가입 폼으로 이동
         }
 
         try {

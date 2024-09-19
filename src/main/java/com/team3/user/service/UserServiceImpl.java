@@ -5,6 +5,7 @@ import com.team3.user.dto.UserLoginDto;
 import com.team3.user.dto.UserSignupDto;
 import com.team3.user.entity.*;
 import com.team3.user.exception.*;
+import com.team3.user.mapper.UserMapper;
 import com.team3.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -69,7 +70,7 @@ public class UserServiceImpl implements UserService{
     public MyPageDto getMyPageById(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을수 없습니다. " + userId));
-        return new MyPageDto(user);
+        return UserMapper.toDTO(user);
     }
 
     // 닉네임 수정
