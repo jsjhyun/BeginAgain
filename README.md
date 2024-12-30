@@ -21,7 +21,7 @@
 ## 👥 Team
 
 <div align="center">
-  <img width="600" alt="스크린샷 2024-12-30 오후 8 30 12" src="https://github.com/user-attachments/assets/857da960-a9bb-42ef-8c9b-3b85e0a9f072" style="height: 400px;/>
+    <img width="600" alt="스크린샷 2024-12-30 오후 8 30 12" src="https://github.com/user-attachments/assets/857da960-a9bb-42ef-8c9b-3b85e0a9f072" style="height: 400px;">
 </div>
 
 <br>
