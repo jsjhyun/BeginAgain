@@ -6,6 +6,8 @@
   <img width="600" alt="스크린샷 2024-12-30 오후 9 03 50" src="https://github.com/user-attachments/assets/4177645a-53fd-47be-9bf8-a2f6e8d5c20b" />
 </div>
 
+> 8/19~8/30 애자일 스프린트
+
 거주하는 지역 중심으로 중고 거래를 진행해보세요.
 
 <br>
